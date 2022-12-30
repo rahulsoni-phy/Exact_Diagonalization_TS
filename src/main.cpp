@@ -13,6 +13,7 @@
 
 #include "Tensor.hpp"
 #include "Parameters_BHZ.hpp"
+#include "Connection_BHZ.hpp"
 
 using namespace std;
 

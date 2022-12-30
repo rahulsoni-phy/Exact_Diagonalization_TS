@@ -1,8 +1,6 @@
 #ifndef Parameters_BHZ_HPP
 #define Parameters_BHZ_HPP
 
-#include <string>
-
 //This class will read from the **input file**
 
 class Parameters_BHZ{
