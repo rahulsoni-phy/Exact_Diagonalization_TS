@@ -12,9 +12,10 @@
 #include <cassert>  //error handling library that aborts the code if defined condition are not met!
 
 extern "C" {
-    #include <lapacke.h>
-    #include <cblas.h>
+#include <cblas.h>
+#include <lapacke.h>
 }
+
 
 #include "Tensor.hpp"
 #include "Parameters_BHZ.hpp"

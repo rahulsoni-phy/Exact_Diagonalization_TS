@@ -5,8 +5,8 @@
 #include <complex>
 
 extern "C" {
-    #include <lapacke.h>
-    #include <cblas.h>
+#include <cblas.h>
+#include <lapacke.h>
 }
 
 #include "Tensor.hpp"
@@ -41,6 +41,7 @@ void Hamiltonian_BHZ::Diagonalizer(Mat_2_Complex_doub Ham_){
             mat[i*(size_)+j] = Ham_[i][j].real()+ Ham_[i][j].imag()*I;
             //mat[i*(size_)+j].real() = Ham_[i][j].real();
             //mat[i*(size_)+j].imag() = Ham_[i][j].imag();
+            
         }
     }
 
@@ -53,8 +54,8 @@ void Hamiltonian_BHZ::Diagonalizer(Mat_2_Complex_doub Ham_){
     for(int i=0;i<size_;i++){
         Evals_[i]=eval[i];
         for(int j=0;j<size_;j++){
-            Evecs_[j][i].real(lapack_complex_double_real(mat[i*(size_)+j]));
-            Evecs_[j][i].imag(lapack_complex_double_imag(mat[i*(size_)+j]));
+            Evecs_[i][j].real(lapack_complex_double_real(mat[i*(size_)+j]));
+            Evecs_[i][j].imag(lapack_complex_double_imag(mat[i*(size_)+j]));
         }
     }
 
