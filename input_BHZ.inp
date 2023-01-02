@@ -4,8 +4,8 @@
 PBC_X=False
 PBC_Y=True
 
-Cells_X=4
-Cells_Y=4
+Cells_X=24
+Cells_Y=24
 
 Total_Orbs=2
 Filling=0.5
@@ -16,7 +16,7 @@ Intra_Orbital_Parameter_B=0.5
 Gap_Parameter_M=0.25
 
 #For smooth edge along X --->
-Smoothness_Width=0
+Smoothness_Width=4
 Confining_Potential_Vo=0.1
 
 #For A(k,w) calculation --->

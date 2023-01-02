@@ -2,6 +2,10 @@
 #include "Parameters_BHZ.hpp"
 #include "Connection_BHZ.hpp"
 
+extern "C" {
+    #include <lapacke.h>
+}
+
 #ifndef Hamiltonian_BHZ_HPP
 #define Hamiltonian_BHZ_HPP
 
@@ -14,11 +18,11 @@ public:
     }
 
     void Initialize();
-    void Diagonalizer(char option);
+    void Diagonalizer(Mat_2_Complex_doub Ham_);
     double FermiFunction(double en_, double mu_);
     double ChemicalPotential(double muin_, double particles_);
     
-    
+    int size_=Parameters_BHZ_.Ham_Size;
 
     Mat_2_Complex_doub Ham_,Evecs_;
     Mat_1_doub Evals_;

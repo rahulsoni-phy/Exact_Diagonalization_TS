@@ -1,6 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <string>
+
 #include "Parameters_BHZ.hpp"
 
 using namespace std;
@@ -55,7 +57,7 @@ void Parameters_BHZ::Initialize(string input_file){
         A_val = matchstring(input_file, "Orbital_Mixing_A");
         B_val = matchstring(input_file, "Intra_Orbital_Parameter_B");
         M_val = matchstring(input_file, "Gap_Parameter_M");
-        Vo_val = matchstring(input_file, "Confining_Potential");
+        Vo_val = matchstring(input_file, "Confining_Potential_Vo");
 
         Temp = matchstring(input_file, "Temperature");
         beta = 1.0/(1.0*Temp);
@@ -104,7 +106,7 @@ double Parameters_BHZ::matchstring(string file, string match){
                 errorout += "= the argument is missing in the input file!";
                 throw std::invalid_argument(errorout);
         }
-        cout<< match <<" = "<< amount <<endl;
+   //     cout<< match <<" = "<< amount <<endl;
         return amount;
 }
 

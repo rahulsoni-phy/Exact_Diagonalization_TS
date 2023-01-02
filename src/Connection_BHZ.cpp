@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Tensor.hpp"
 #include "Parameters_BHZ.hpp"
 #include "Connection_BHZ.hpp"
@@ -82,6 +83,13 @@ void Connection_BHZ::ConnectionMatrix(){
 
                 }
             }
+        }
+
+        for(int i=0;i<size_;i++){
+            for(int j=0;j<size_;j++){
+                cout<<C_mat[i][j]<<" ";
+            }
+            cout<<endl;
         }
     }
 

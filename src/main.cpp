@@ -11,6 +11,11 @@
 #include <cmath>    //for common mathematical functions!
 #include <cassert>  //error handling library that aborts the code if defined condition are not met!
 
+extern "C" {
+    #include <lapacke.h>
+    #include <cblas.h>
+}
+
 #include "Tensor.hpp"
 #include "Parameters_BHZ.hpp"
 #include "Connection_BHZ.hpp"
@@ -18,7 +23,18 @@
 
 using namespace std;
 
-int main(){
+int main(int argc, char *argv[]){
+
+    string Model_type = argv[1];
+    string input_file = argv[2];
+
+    if(Model_type=="BHZ"){
+        Parameters_BHZ Parameters_BHZ_;
+        Parameters_BHZ_.Initialize(input_file);
+
+        Connection_BHZ Connection_BHZ_(Parameters_BHZ_);
+        Connection_BHZ_.ConnectionMatrix();
+    }
 
     return 0;
 }

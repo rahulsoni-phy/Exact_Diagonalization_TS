@@ -18,9 +18,9 @@ class Parameters_BHZ{
                 double w_min,w_max;
                 double dw_dos,eta_dos;
 
-                void Initialize(string input_file);
-                double matchstring(string file, string match);
-                string matchstring2(string file, string match);
+                void Initialize(std::string input_file);
+                double matchstring(std::string file, std::string match);
+                std::string matchstring2(std::string file, std::string match);
 };
 
 #endif
