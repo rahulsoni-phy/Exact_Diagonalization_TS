@@ -1,7 +1,8 @@
 {
 	"folders": [
 		{
-			"path": "Exact_Diagonalization_TS"
+			"path": "."
 		}
-	]
+	],
+	"settings": {}
 }

@@ -1,7 +1,13 @@
 #include <iostream>
-#include "Tensor.hpp"
+#include <fstream>
+#include <complex>
+#include <Eigen/Dense>
+
 #include "Parameters_BHZ.hpp"
 #include "Connection_BHZ.hpp"
+
+using namespace std;
+using namespace Eigen;
 
 void Connection_BHZ::Initialize(){
     lx_=Parameters_BHZ_.Lx;
@@ -13,6 +19,9 @@ void Connection_BHZ::Initialize(){
 
     orbs_=Parameters_BHZ_.N_Orbs;
     spin_=2;
+
+    size_=Parameters_BHZ_.Ham_Size;
+    C_mat = MatrixXcd::Zero(size_,size_);
 
     if(Parameters_BHZ_.PBC_X==true){
         Periodic_X=true;
@@ -27,23 +36,13 @@ void Connection_BHZ::Initialize(){
     else{
         Periodic_Y=false;
     }
-
-    size_=Parameters_BHZ_.Ham_Size;
-
-    C_mat.resize(size_);
-    for(int i=0;i<size_;i++){
-        C_mat[i].resize(size_);
-        for(int j=0;j<size_;j++){
-            C_mat[i][j]=Zero_Complex;
-        }
-    }
-
 }
 
 void Connection_BHZ::ConnectionMatrix(){
 
     int r, r0, r1, r2;
     int half_size_= (int) (size_/2);
+    complex<double> One_Complex(1.0,0.0),Zero_Complex(0.0,0.0),Iota_Complex(0.0,1.0);    
 
     for(int spin=0;spin<spin_;spin++){
         for(int orb=0;orb<orbs_;orb++){
@@ -55,41 +54,34 @@ void Connection_BHZ::ConnectionMatrix(){
                     r2= spin*half_size_ + (orb + 2*(ry+1) + 2*ly_*rx);
 
                     //Adding onsite mass term and NN hopping connections:---->
-                    C_mat[r][r] = 1.0*( pow(-1.0, 1.0*orb) )*(M_-4*B_)*One_Complex;
+                    C_mat(r,r) = 1.0*( pow(-1.0, 1.0*orb) )*(M_-4*B_)*One_Complex;
 
                     if(rx!=lx_-1){
-                        C_mat[r][r1] = 1.0*( pow(-1.0, 1.0*orb) )*B_*One_Complex;
-                        C_mat[r1][r] = 1.0*( pow(-1.0, 1.0*orb) )*B_*One_Complex;
+                        C_mat(r,r1) = 1.0*( pow(-1.0, 1.0*orb) )*B_*One_Complex;
+                        C_mat(r1,r) = 1.0*( pow(-1.0, 1.0*orb) )*B_*One_Complex;
                     }
                     if(ry!=ly_-1){
-                        C_mat[r][r2] = 1.0*( pow(-1.0, 1.0*orb) )*B_*One_Complex;
-                        C_mat[r2][r] = 1.0*( pow(-1.0, 1.0*orb) )*B_*One_Complex;
+                        C_mat(r,r2) = 1.0*( pow(-1.0, 1.0*orb) )*B_*One_Complex;
+                        C_mat(r2,r) = 1.0*( pow(-1.0, 1.0*orb) )*B_*One_Complex;
                     }
 
                     if(Periodic_X==true){
                         r0 = spin*half_size_ + (orb + 2*ry);
                         if(rx==lx_-1){
-                            C_mat[r][r0] = 1.0*( pow(-1.0, 1.0*orb) )*B_*One_Complex;
-                            C_mat[r0][r] = 1.0*( pow(-1.0, 1.0*orb) )*B_*One_Complex;
+                            C_mat(r,r0) = 1.0*( pow(-1.0, 1.0*orb) )*B_*One_Complex;
+                            C_mat(r0,r) = 1.0*( pow(-1.0, 1.0*orb) )*B_*One_Complex;
                         }
                     }
                     if(Periodic_Y==true){
                         r0 = spin*half_size_ + (orb + 2*ly_*rx);
                         if(ry==ly_-1){
-                            C_mat[r][r0] = 1.0*( pow(-1.0, 1.0*orb) )*B_*One_Complex;
-                            C_mat[r0][r] = 1.0*( pow(-1.0, 1.0*orb) )*B_*One_Complex;
+                            C_mat(r,r0) = 1.0*( pow(-1.0, 1.0*orb) )*B_*One_Complex;
+                            C_mat(r0,r) = 1.0*( pow(-1.0, 1.0*orb) )*B_*One_Complex;
                         }
                     }
 
                 }
             }
-        }
-
-        for(int i=0;i<size_;i++){
-            for(int j=0;j<size_;j++){
-                cout<<C_mat[i][j]<<" ";
-            }
-            cout<<endl;
         }
     }
 
@@ -123,12 +115,12 @@ void Connection_BHZ::ConnectionMatrix(){
                     //R->R+x : ---------->
                     if(rx!=lx_-1){
                         if(spin==0){
-                            C_mat[r1][r] = -(1.0*A_/2.0)*Iota_Complex;
-                            C_mat[r][r1] = (1.0*A_/2.0)*Iota_Complex;
+                            C_mat(r1,r) = -(1.0*A_/2.0)*Iota_Complex;
+                            C_mat(r,r1) = (1.0*A_/2.0)*Iota_Complex;
                         }
                         if(spin==1){
-                            C_mat[r1][r] = (1.0*A_/2.0)*Iota_Complex;
-                            C_mat[r][r1] = -(1.0*A_/2.0)*Iota_Complex;
+                            C_mat(r1,r) = (1.0*A_/2.0)*Iota_Complex;
+                            C_mat(r,r1) = -(1.0*A_/2.0)*Iota_Complex;
                         }
                     }
 
@@ -138,12 +130,12 @@ void Connection_BHZ::ConnectionMatrix(){
                             if(orb==1){ r0 = spin*half_size_ + (0 + 2*ry); }
 
                             if(spin==0){
-                                C_mat[r0][r] = -(1.0*A_/2.0)*Iota_Complex;
-                                C_mat[r][r0] = (1.0*A_/2.0)*Iota_Complex;
+                                C_mat(r0,r) = -(1.0*A_/2.0)*Iota_Complex;
+                                C_mat(r,r0) = (1.0*A_/2.0)*Iota_Complex;
                             }
                             if(spin==1){
-                                C_mat[r0][r] = (1.0*A_/2.0)*Iota_Complex;
-                                C_mat[r][r0] = -(1.0*A_/2.0)*Iota_Complex;
+                                C_mat(r0,r) = (1.0*A_/2.0)*Iota_Complex;
+                                C_mat(r,r0) = -(1.0*A_/2.0)*Iota_Complex;
                             }
                         }
                     }
@@ -151,12 +143,12 @@ void Connection_BHZ::ConnectionMatrix(){
                     //R->R+y : ---------->
                     if(ry!=ly_-1){
                         if(orb==0){
-                            C_mat[r2][r] = (1.0*A_/2.0)*One_Complex;
-                            C_mat[r][r2] = (1.0*A_/2.0)*One_Complex;
+                            C_mat(r2,r) = (1.0*A_/2.0)*One_Complex;
+                            C_mat(r,r2) = (1.0*A_/2.0)*One_Complex;
                         }
                         if(orb==1){
-                            C_mat[r2][r] = -(1.0*A_/2.0)*One_Complex;
-                            C_mat[r][r2] = -(1.0*A_/2.0)*One_Complex;
+                            C_mat(r2,r) = -(1.0*A_/2.0)*One_Complex;
+                            C_mat(r,r2) = -(1.0*A_/2.0)*One_Complex;
                         }
                     }
 
@@ -167,12 +159,12 @@ void Connection_BHZ::ConnectionMatrix(){
                             if(orb==1){ r0 = spin*half_size_ + (0 + 2*ly_*rx); }
 
                             if(orb==0){
-                                C_mat[r0][r] = (1.0*A_/2.0)*One_Complex;
-                                C_mat[r][r0] = (1.0*A_/2.0)*One_Complex;
+                                C_mat(r0,r) = (1.0*A_/2.0)*One_Complex;
+                                C_mat(r,r0) = (1.0*A_/2.0)*One_Complex;
                             }
                             if(orb==1){
-                                C_mat[r0][r] = -(1.0*A_/2.0)*One_Complex;
-                                C_mat[r][r0] = -(1.0*A_/2.0)*One_Complex;
+                                C_mat(r0,r) = -(1.0*A_/2.0)*One_Complex;
+                                C_mat(r,r0) = -(1.0*A_/2.0)*One_Complex;
                             }
                         }
                     }
@@ -181,5 +173,14 @@ void Connection_BHZ::ConnectionMatrix(){
             }
         }
     }
+
+}
+
+void Connection_BHZ::PrintConnection(){
+
+    string HamPrint="Hamiltonian_BHZ.txt";
+    ofstream file_HamPrint_out(HamPrint.c_str());
+
+    file_HamPrint_out<<C_mat<<endl;
 
 }

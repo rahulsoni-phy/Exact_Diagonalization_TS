@@ -4,8 +4,8 @@
 PBC_X=False
 PBC_Y=True
 
-Cells_X=4
-Cells_Y=4
+Cells_X=3
+Cells_Y=3
 
 Total_Orbs=2
 Filling=0.5

@@ -49,6 +49,7 @@ void Parameters_BHZ::Initialize(string input_file){
 
         Total_Particles=Fill*Ham_Size;
 
+        cout<<"Total size of the Hamiltonian = "<<Ham_Size<<"x"<<Ham_Size<<endl;
         cout<<"Total number of unit cells = "<<Total_Cells<<endl;
         cout<<"Total number of particles = "<<Total_Particles<<endl;
         cout<<"Boundary conditions along-x = "<<pbc_x_out<<endl;

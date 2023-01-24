@@ -1,13 +1,11 @@
-#include "Tensor.hpp"
+#include <Eigen/Dense>
 #include "Parameters_BHZ.hpp"
 #include "Connection_BHZ.hpp"
 
-extern "C" {
-    #include <lapacke.h>
-}
-
 #ifndef Hamiltonian_BHZ_HPP
 #define Hamiltonian_BHZ_HPP
+
+using namespace Eigen;
 
 class Hamiltonian_BHZ
 {
@@ -18,14 +16,14 @@ public:
     }
 
     void Initialize();
-    void Diagonalizer(Mat_2_Complex_doub Ham_);
+    void Diagonalizer();
     double FermiFunction(double en_, double mu_);
     double ChemicalPotential(double muin_, double particles_);
     
     int size_=Parameters_BHZ_.Ham_Size;
 
-    Mat_2_Complex_doub Ham_,Evecs_;
-    Mat_1_doub Evals_;
+    MatrixXcd Evecs_;
+    VectorXd Evals_;
 
     Parameters_BHZ &Parameters_BHZ_;
     Connection_BHZ &Connection_BHZ_;

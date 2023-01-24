@@ -8,7 +8,7 @@ INCLUDE:=include
 LIBRARIES:=
 EXECUTABLE:=main
 
-MKL_LIB:=-llapack -lblas
+EIGEN_INCLUDE:=/usr/include/eigen3/
 
 all:$(BIN)/$(EXECUTABLE)
 
@@ -17,7 +17,7 @@ run: clean all
 	./$(BIN)/$(EXECUTABLE)
 
 $(BIN)/$(EXECUTABLE): $(SRC)/*.cpp
-	$(CXX) $(CXX_FLAGS) $(MKL_LIB) -I$(INCLUDE) $^ -o $@ $(LIBRARIES)
+	$(CXX) $(CXX_FLAGS) -I$(EIGEN_INCLUDE) -I$(INCLUDE) $^ -o $@ $(LIBRARIES)
 
 clean:
 		-rm $(BIN)/*

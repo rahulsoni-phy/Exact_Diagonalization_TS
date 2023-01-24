@@ -1,70 +1,44 @@
 #include <iostream>
-#include <stdio.h>
 #include <fstream>
 #include <cmath>
 #include <complex>
+#include <Eigen/Dense>
+#include <Eigen/Eigenvalues>
 
-extern "C" {
-#include <cblas.h>
-#include <lapacke.h>
-}
-
-#include "Tensor.hpp"
 #include "Parameters_BHZ.hpp"
 #include "Connection_BHZ.hpp"
 #include "Hamiltonian_BHZ.hpp"
 
 using namespace std;
+using namespace Eigen;
 
 void Hamiltonian_BHZ::Initialize(){
-    Evals_.resize(size_);
-    Evecs_.resize(size_);
-    Ham_.resize(size_);
-    for(int i=0;i<size_;i++){
-        Evecs_[i].resize(size_);
-        Ham_[i].resize(size_);
-    }
-
+    size_=Parameters_BHZ_.Ham_Size;
+    Evals_ = VectorXd::Zero(size_);
+    Evecs_ = MatrixXcd::Zero(size_,size_);;
 }
 
 
+void Hamiltonian_BHZ::Diagonalizer(){
 
-void Hamiltonian_BHZ::Diagonalizer(Mat_2_Complex_doub Ham_){
-    int LDA=size_;
-    int info;
-    /* Local arrays */
-    double* eval = new double[size_];
-    lapack_complex_double* mat = (lapack_complex_double *) calloc(size_*size_, sizeof(lapack_complex_double));
+    //Diagonalize the Hamiltonian:->
+    SelfAdjointEigenSolver<MatrixXcd> solver;
+    solver.compute(Connection_BHZ_.C_mat);
 
-    for(int i=0;i<size_;i++){
-        for(int j=0;j<size_;j++){
-            mat[i*(size_)+j] = Ham_[i][j].real()+ Ham_[i][j].imag()*I;
-            //mat[i*(size_)+j].real() = Ham_[i][j].real();
-            //mat[i*(size_)+j].imag() = Ham_[i][j].imag();
-            
-        }
-    }
+    if(solver.info()!=Success)
+        abort();
 
-    info=LAPACKE_zheev(LAPACK_ROW_MAJOR, 'V', 'L', size_, mat, LDA, eval);
-
-    if(info > 0){
-        cout<< "The LAPACKE_zheev failed to diagonalize."<<endl;
-    }
-
-    for(int i=0;i<size_;i++){
-        Evals_[i]=eval[i];
-        for(int j=0;j<size_;j++){
-            Evecs_[i][j].real(lapack_complex_double_real(mat[i*(size_)+j]));
-            Evecs_[i][j].imag(lapack_complex_double_imag(mat[i*(size_)+j]));
-        }
-    }
+    Evals_ = solver.eigenvalues();
+    Evecs_ = solver.eigenvectors();
 
     string Evals_out="Eigenvalues.txt";
     ofstream Evals_file_out(Evals_out.c_str());
 
-    for(int i=0;i<size_;i++){
-        Evals_file_out<<eval[i]<<endl;
+    for(int i=0;i<Evals_.size();i++){
+        Evals_file_out<<i<<"    "<<Evals_(i)<<endl;
     }
+    
+    
 }
 
 
