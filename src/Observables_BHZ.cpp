@@ -14,11 +14,6 @@
 using namespace std;
 using namespace Eigen;
 
-typedef vector< complex<double> >  Mat_1_Complex_doub; //defines a 1D array of complex numbers
-typedef vector<Mat_1_Complex_doub> Mat_2_Complex_doub; //defines a 2D array of complex numbers
-typedef vector<Mat_2_Complex_doub> Mat_3_Complex_doub;
-typedef vector<Mat_3_Complex_doub> Mat_4_Complex_doub;
-
 void Observables_BHZ::Initialize(){
     lx_ = Parameters_BHZ_.Lx;
     ly_ = Parameters_BHZ_.Ly;
@@ -38,7 +33,52 @@ void Observables_BHZ::Initialize(){
 
     w_size = (int) ( (Parameters_BHZ_.w_max - Parameters_BHZ_.w_min)/dw );
 
+    B_mat.resize(cells_);
+    for(int r1=0;r1<cells_;r1++){
+        B_mat[r1].resize(cells_);
+
+        for(int r2=0;r2<cells_;r2++){
+            B_mat[r1][r2].resize(w_size);
+
+            for(int om=0;om<w_size;om++){
+                B_mat[r1][r2][om] = Zero_Complex;
+            }
+        }
+    }
+
+    int m1,m2;
+    omega=0.0;
+
+    for(int r1=0;r1<cells_;r1++){
+        r1x = r1/ly_;
+        r1y = r1%ly_;
+
+        for(int r2=0;r2<cells_;r2++){
+            r2x = r2/ly_;
+            r2y = r2%ly_;
+
+            for(int om=0;om<w_size;om++){
+                omega = Parameters_BHZ_.w_min + om*dw;
+
+                for(int orb=0;orb<orbs_;orb++){
+                    for(int s=0;s<spin_;s++){
+                        m1 = s*mhs_ + orb + 2*r1y + 2*ly_*r1x;
+                        m2 = s*mhs_ + orb + 2*r2y + 2*ly_*r2x;
+
+                        for(int n=0;n<size_;n++){
+                            B_mat[r1][r2][om] += (1.0/PI)*( ( conj(evecs_(n,m1)) ) * (evecs_(n,m2)) )*( 
+                                (eta)/((omega-evals_(n))*(omega-evals_(n))+(eta*eta)) );
+                        }
+                    }
+                }
+            }
+
+        }
+
+    }
+
 }
+
 
 void Observables_BHZ::Calculate_Local_Density_of_Electrons(){
 
@@ -185,60 +225,12 @@ void Observables_BHZ::Calculate_MomSpace_Occupation_Number(){
 
 
 void Observables_BHZ::Calculate_Energy_Bands_on_Path(){
-
-    Mat_3_Complex_doub B_mat;
-    B_mat.resize(cells_);
-    for(int r1=0;r1<cells_;r1++){
-        B_mat[r1].resize(cells_);
-
-        for(int r2=0;r2<cells_;r2++){
-            B_mat[r1][r2].resize(w_size);
-
-            for(int om=0;om<w_size;om++){
-                B_mat[r1][r2][om] = Zero_Complex;
-            }
-        }
-    }
-
-    int r1x,r1y,r2x,r2y;
-    int m1,m2;
-    double omega;
-    omega=0.0;
-
-    for(int r1=0;r1<cells_;r1++){
-        r1x = r1/ly_;
-        r1y = r1%ly_;
-
-        for(int r2=0;r2<cells_;r2++){
-            r2x = r2/ly_;
-            r2y = r2%ly_;
-
-            for(int om=0;om<w_size;om++){
-                omega = Parameters_BHZ_.w_min + om*dw;
-
-                for(int orb=0;orb<orbs_;orb++){
-                    for(int s=0;s<spin_;s++){
-                        m1 = s*mhs_ + orb + 2*r1y + 2*ly_*r1x;
-                        m2 = s*mhs_ + orb + 2*r2y + 2*ly_*r2x;
-
-                        for(int n=0;n<size_;n++){
-                            B_mat[r1][r2][om] += (1.0/PI)*( ( conj(evecs_(n,m1)) ) * (evecs_(n,m2)) )*( 
-                                (eta)/((omega-evals_(n))*(omega-evals_(n))+(eta*eta)) );
-                        }
-                    }
-                }
-            }
-
-        }
-
-    }
-
-    int kx_ind,ky_ind,k_ind;
-    double kx,ky;
-    complex<double> Akw_;
-
+    
     string file_Akw="Akw_on_path.txt";
     ofstream file_Akw_out(file_Akw.c_str());
+
+    complex<double> Akw_;
+    omega=0.0;
 
     //Path Gamma to X--->
     ky_ind=0;
@@ -321,5 +313,34 @@ void Observables_BHZ::Calculate_Energy_Bands_on_Path(){
 
 
 void Observables_BHZ::Calculate_Spectral_Function(){
-    
+
+    string file_Akxw("Akxw.txt");
+    ofstream file_Akxw_out(file_Akxw.c_str());
+
+    complex<double> Akxw_;
+    omega=0.0;
+
+    for(kx_ind=-lx_/2;kx_ind<=lx_/2;kx_ind++){
+        kx=((2*PI*kx_ind)/(1.0*lx_));
+
+        for(int om=0;om<w_size;om++){
+            omega=Parameters_BHZ_.w_min + om*dw;
+            Akxw_ = Zero_Complex;
+
+            for(r1x=0;r1x<lx_;r1x++){
+                for(r2x=0;r2x<lx_;r2x++){
+
+                    Akxw_ += (1.0/(4.0*lx_))*( exp(Iota_Complex*kx*(1.0*(r1x-r2x)))*B_mat[r1x][r2x][om] );
+
+                }
+            }
+            file_Akxw_out<<kx<<"    "<<omega<<"     "<<Akxw_.real()<<endl;
+        }
+        file_Akxw_out<<endl;
+    }
+}
+
+
+void Observables_BHZ::Calculate_Spin_Chern_Number(){
+
 }
