@@ -36,13 +36,15 @@ void Connection_BHZ::Initialize(){
     else{
         Periodic_Y=false;
     }
+
+    complex<double> One_Complex(1.0,0.0),Zero_Complex(0.0,0.0),Iota_Complex(0.0,1.0);
 }
 
 void Connection_BHZ::ConnectionMatrix(){
 
     int r, r0, r1, r2;
     int half_size_= (int) (size_/2);
-    complex<double> One_Complex(1.0,0.0),Zero_Complex(0.0,0.0),Iota_Complex(0.0,1.0);    
+        
 
     for(int spin=0;spin<spin_;spin++){
         for(int orb=0;orb<orbs_;orb++){

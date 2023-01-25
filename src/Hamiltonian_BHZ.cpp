@@ -37,28 +37,27 @@ void Hamiltonian_BHZ::Diagonalizer(){
     for(int i=0;i<Evals_.size();i++){
         Evals_file_out<<i<<"    "<<Evals_(i)<<endl;
     }
-    
-    
+        
 }
 
 
 
-double Hamiltonian_BHZ::ChemicalPotential(double muin_, double particles_){
+double Hamiltonian_BHZ::ChemicalPotential(double particles_){
     double mu_temp, eps_, dmu_by_dN, N_temp, dmu_by_dN_min, Ne_;
     eps_=1e-2;
-    mu_temp=Evals_[0];
+    mu_temp=Evals_(0);
     N_temp=100000;
     Ne_=1.0*particles_;
     
     int iters=0;
 
-    dmu_by_dN = 0.01*( Evals_[size_-1] - Evals_[0] )*( 1.0/(1.0*size_) );
-    dmu_by_dN_min = 0.0001*( Evals_[size_-1] - Evals_[0] )*( 1.0/(1.0*size_) );
+    dmu_by_dN = 0.01*( Evals_(size_-1) - Evals_(0) )*( 1.0/(1.0*size_) );
+    dmu_by_dN_min = 0.0001*( Evals_(size_-1) - Evals_(0) )*( 1.0/(1.0*size_) );
 
     while( abs(N_temp - Ne_) > eps_){
         N_temp=0;
         for(int i=0;i<size_;i++){
-            N_temp += FermiFunction(Evals_[i],mu_temp);
+            N_temp += FermiFunction(Evals_(i),mu_temp);
         }
 
         mu_temp = mu_temp + dmu_by_dN*(Ne_-N_temp);

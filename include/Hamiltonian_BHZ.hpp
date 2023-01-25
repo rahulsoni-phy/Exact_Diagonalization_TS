@@ -18,7 +18,7 @@ public:
     void Initialize();
     void Diagonalizer();
     double FermiFunction(double en_, double mu_);
-    double ChemicalPotential(double muin_, double particles_);
+    double ChemicalPotential(double particles_);
     
     int size_=Parameters_BHZ_.Ham_Size;
 

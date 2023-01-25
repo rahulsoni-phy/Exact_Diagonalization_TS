@@ -17,6 +17,7 @@ public:
     }
     int lx_, ly_, orbs_, spin_,size_;
     double A_, B_, M_;
+    complex<double> Zero_Complex, One_Complex, Iota_Complex;
 
     MatrixXcd C_mat;
 

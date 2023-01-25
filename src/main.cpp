@@ -16,6 +16,7 @@
 #include "Parameters_BHZ.hpp"
 #include "Connection_BHZ.hpp"
 #include "Hamiltonian_BHZ.hpp"
+#include "Observables_BHZ.hpp"
 
 using namespace std;
 
@@ -34,6 +35,8 @@ int main(int argc, char *argv[]){
 
         Hamiltonian_BHZ Hamiltonian_BHZ_(Parameters_BHZ_,Connection_BHZ_);
         Hamiltonian_BHZ_.Diagonalizer();
+
+        Observables_BHZ Observables_BHZ_(Parameters_BHZ_,Connection_BHZ_,Hamiltonian_BHZ_);
     }
 
     return 0;
