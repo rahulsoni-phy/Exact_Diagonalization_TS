@@ -233,5 +233,93 @@ void Observables_BHZ::Calculate_Energy_Bands_on_Path(){
 
     }
 
+    int kx_ind,ky_ind,k_ind;
+    double kx,ky;
+    complex<double> Akw_;
+
+    string file_Akw="Akw_on_path.txt";
+    ofstream file_Akw_out(file_Akw.c_str());
+
+    //Path Gamma to X--->
+    ky_ind=0;
+    k_ind=0;
+    for(kx_ind=0;kx_ind<=lx_/2;kx_ind++){
+        kx = (2.0*PI*kx_ind)/(1.0*lx_);
+        ky = (2.0*PI*ky_ind)/(1.0*ly_);
+
+        for(int om=0;om<w_size;om++){
+            omega = Parameters_BHZ_.w_min + om*dw;
+            Akw_ = Zero_Complex;
+
+            for(int r1=0;r1<cells_;r1++){
+                r1x = r1/ly_;       r1y = r1%ly_;
+                for(int r2=0;r2<cells_;r2++){
+                    r2x = r2/ly_;       r2y = r2%ly_;
+
+                    Akw_ += (1.0/(4.0*cells_))*( exp(Iota_Complex*kx*(1.0*(r1x-r2x)))*exp(Iota_Complex*ky*(1.0*(r1y-r2y)))*
+                            B_mat[r1][r2][om] );
+                }
+            }
+            file_Akw_out<<k_ind<<"      "<<omega<<"     "<<Akw_.real()<<endl;
+        }
+        file_Akw_out<<endl;
+        k_ind = k_ind + 1;
+    }
+
+    //Path X to M --->
+    kx_ind=lx_/2;
+    for(ky_ind=0;ky_ind<=ly_/2;ky_ind++){
+        kx = (2.0*PI*kx_ind)/(1.0*lx_);
+        ky = (2.0*PI*ky_ind)/(1.0*ly_);
+
+        for(int om=0;om<w_size;om++){
+            omega = Parameters_BHZ_.w_min + om*dw;
+            Akw_ = Zero_Complex;
+
+            for(int r1=0;r1<cells_;r1++){
+                r1x = r1/ly_;       r1y = r1%ly_;
+                for(int r2=0;r2<cells_;r2++){
+                    r2x = r2/ly_;       r2y = r2%ly_;
+
+                    Akw_ += (1.0/(4.0*cells_))*( exp(Iota_Complex*kx*(1.0*(r1x-r2x)))*exp(Iota_Complex*ky*(1.0*(r1y-r2y)))*
+                            B_mat[r1][r2][om] );
+                }
+            }
+            file_Akw_out<<k_ind<<"      "<<omega<<"     "<<Akw_.real()<<endl;
+        }
+        file_Akw_out<<endl;
+        k_ind = k_ind + 1;
+    }
+
+    //Path M to Gamma --->
+    kx_ind=lx_/2-1;
+    ky_ind=ly_/2-1;
+    for(kx_ind=(lx_/2)-1;kx_ind>=0;kx_ind--){
+        kx = (2.0*PI*kx_ind)/(1.0*lx_);
+        ky = (2.0*PI*kx_ind)/(1.0*ly_);
+
+        for(int om=0;om<w_size;om++){
+            omega = Parameters_BHZ_.w_min + om*dw;
+            Akw_ = Zero_Complex;
+
+            for(int r1=0;r1<cells_;r1++){
+                r1x = r1/ly_;       r1y = r1%ly_;
+                for(int r2=0;r2<cells_;r2++){
+                    r2x = r2/ly_;       r2y = r2%ly_;
+
+                    Akw_ += (1.0/(4.0*cells_))*( exp(Iota_Complex*kx*(1.0*(r1x-r2x)))*exp(Iota_Complex*ky*(1.0*(r1y-r2y)))*
+                            B_mat[r1][r2][om] );
+                }
+            }
+            file_Akw_out<<k_ind<<"      "<<omega<<"     "<<Akw_.real()<<endl;
+        }
+        file_Akw_out<<endl;
+        k_ind = k_ind + 1;
+    }
+
 }
 
+
+void Observables_BHZ::Calculate_Spectral_Function(){
+    
+}
