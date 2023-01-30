@@ -12,6 +12,8 @@ using namespace Eigen;
 void Connection_BHZ::Initialize(){
     lx_=Parameters_BHZ_.Lx;
     ly_=Parameters_BHZ_.Ly;
+    w_=Parameters_BHZ_.Wx;
+    Vo_=Parameters_BHZ_.Vo_val;
 
     A_=Parameters_BHZ_.A_val;
     B_=Parameters_BHZ_.B_val;
@@ -81,6 +83,15 @@ void Connection_BHZ::ConnectionMatrix(){
                             C_mat(r0,r) = 1.0*( pow(-1.0, 1.0*orb) )*B_*One_Complex;
                         }
                     }
+
+                    //Adding smooth boundary connections
+                    if(rx <= w_){
+                        C_mat(r,r) += 1.0*( Vo_*(w_-rx)/(1.0*w_) )*One_Complex;
+                    }
+                    if(rx >= lx_-w_){
+                        C_mat(r,r) += 1.0*( Vo_*(rx+w_-lx_+1)/(1.0*w_) )*One_Complex;
+                    }
+
 
                 }
             }
