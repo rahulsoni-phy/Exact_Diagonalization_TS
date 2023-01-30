@@ -6,7 +6,7 @@
 #include <cstdlib>  //defines standard C++ functions and macros! (like: atof, atoi, abs, rand etc.)
 #include <string>   //for objects that can be represented as stream of characters!
 #include <stdexcept>//defines a set of standard exceptions and report common errors!
-#include <random>   //for random numbers!
+//#include <random>   //for random numbers!
 #include <complex>  //for complex numbers!
 #include <cmath>    //for common mathematical functions!
 #include <cassert>  //error handling library that aborts the code if defined condition are not met!
@@ -37,6 +37,9 @@ int main(int argc, char *argv[]){
         Hamiltonian_BHZ_.Diagonalizer();
 
         Observables_BHZ Observables_BHZ_(Parameters_BHZ_,Connection_BHZ_,Hamiltonian_BHZ_);
+        Observables_BHZ_.Calculate_Local_Density_of_Electrons();
+        //Observables_BHZ_.Calculate_MomSpace_Occupation_Number();
+        //Observables_BHZ_.Calculate_Spectral_Function();
     }
 
     return 0;
