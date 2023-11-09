@@ -9,8 +9,8 @@ using namespace std;
 
 void Parameters_BHZ::Initialize(string input_file){
 
-        string PBC_X_string,PBC_Y_string;
-        string pbc_x_out, pbc_y_out;
+        string PBC_X_string,PBC_Y_string,SBC_X_string;
+        string pbc_x_out, pbc_y_out, sbc_x_out;
 
         cout<<"-------------------------------------------"<<endl;
         cout<<"Reading the input file = "<<input_file<<endl;
@@ -36,6 +36,16 @@ void Parameters_BHZ::Initialize(string input_file){
                 pbc_y_out="OBC";
         }
 
+        SBC_X_string=matchstring2(input_file,"SBC_X");
+        if(SBC_X_string=="True"){
+                SBC_X=true;
+                sbc_x_out="ON";
+        }
+        else{
+                SBC_X=false;
+                sbc_x_out="OFF";
+        }
+
         Lx = int(matchstring(input_file, "Cells_X"));
         Ly = int(matchstring(input_file, "Cells_Y"));
         N_Orbs = int(matchstring(input_file, "Total_Orbs"));
@@ -54,6 +64,7 @@ void Parameters_BHZ::Initialize(string input_file){
         cout<<"Total number of particles = "<<Total_Particles<<endl;
         cout<<"Boundary conditions along-x = "<<pbc_x_out<<endl;
         cout<<"Boundary conditions along-y = "<<pbc_y_out<<endl;
+        cout<<"Smooth boundary along-x = "<<sbc_x_out<<endl;
 
         A_val = matchstring(input_file, "Orbital_Mixing_A");
         B_val = matchstring(input_file, "Intra_Orbital_Parameter_B");

@@ -4,18 +4,23 @@
 PBC_X=False
 PBC_Y=True
 
-Cells_X=3
-Cells_Y=3
-
+Cells_X=24
+Cells_Y=24
 Total_Orbs=2
+
+#Canonical-parameters
 Filling=0.5
 Temperature=0.0001
+
+#GrandCanonical-parameters
+
 
 Orbital_Mixing_A=1.0
 Intra_Orbital_Parameter_B=0.5
 Gap_Parameter_M=0.25
 
 #For smooth edge along X --->
+SBC_X=False
 Smoothness_Width=0
 Confining_Potential_Vo=0.1
 
@@ -23,5 +28,5 @@ Confining_Potential_Vo=0.1
 Min_w=-5.0
 Max_w=5.0
 
-Width_dw=0.01
-Broadening_eta=0.005
+Width_dw=0.005
+Broadening_eta=0.01

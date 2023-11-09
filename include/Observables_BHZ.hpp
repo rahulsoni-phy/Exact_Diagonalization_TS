@@ -43,6 +43,7 @@ public:
 
     void Initialize();
     void Calculate_Local_Density_of_Electrons();
+    void Calculate_Density_of_States();
     void Calculate_MomSpace_Occupation_Number();
     void Calculate_Energy_Bands_on_Path();
     void Calculate_Spectral_Function();

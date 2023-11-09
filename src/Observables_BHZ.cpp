@@ -143,6 +143,28 @@ void Observables_BHZ::Calculate_Local_Density_of_Electrons(){
 }
 
 
+void Observables_BHZ::Calculate_Density_of_States(){
+
+    string file_dos="Density_of_states.txt";
+    ofstream file_dos_out(file_dos.c_str());
+
+    double omega=Parameters_BHZ_.w_min;
+    double dos_val;
+
+    while(omega <= Parameters_BHZ_.w_max){
+        dos_val=0.0;
+        file_dos_out<< omega <<"    ";
+
+        for(int n=0;n<size_;n++){
+            dos_val += (1.0/(size_*PI))*(eta/((omega-evals_(n))*(omega-evals_(n)) + eta*eta));
+        }
+
+        file_dos_out<<dos_val<<endl;
+        omega = omega + dw;
+    }    
+}
+
+
 void Observables_BHZ::Calculate_MomSpace_Occupation_Number(){
 
     Mat_2_Complex_doub P_r_rp;

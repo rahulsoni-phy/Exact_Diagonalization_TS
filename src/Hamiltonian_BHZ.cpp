@@ -14,8 +14,8 @@ using namespace Eigen;
 
 void Hamiltonian_BHZ::Initialize(){
     size_=Parameters_BHZ_.Ham_Size;
-    Evals_ = VectorXd::Zero(size_);
-    Evecs_ = MatrixXcd::Zero(size_,size_);;
+    Evals_=VectorXd::Zero(size_);
+    Evecs_=MatrixXcd::Zero(size_,size_);
 }
 
 
@@ -39,7 +39,6 @@ void Hamiltonian_BHZ::Diagonalizer(){
     }
         
 }
-
 
 
 double Hamiltonian_BHZ::ChemicalPotential(double particles_){
@@ -74,7 +73,6 @@ double Hamiltonian_BHZ::ChemicalPotential(double particles_){
 
     return mu_temp;
 }
-
 
 
 double Hamiltonian_BHZ::FermiFunction(double en_, double mu_){

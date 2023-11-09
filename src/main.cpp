@@ -12,7 +12,6 @@
 #include <cassert>  //error handling library that aborts the code if defined condition are not met!
 
 
-
 #include "Parameters_BHZ.hpp"
 #include "Connection_BHZ.hpp"
 #include "Hamiltonian_BHZ.hpp"
@@ -33,10 +32,16 @@ int main(int argc, char *argv[]){
         Connection_BHZ_.ConnectionMatrix();
         Connection_BHZ_.PrintConnection();
 
+        cout<<"1"<<endl;
         Hamiltonian_BHZ Hamiltonian_BHZ_(Parameters_BHZ_,Connection_BHZ_);
+        cout<<"1"<<endl;
+        Hamiltonian_BHZ_.Initialize();
+        cout<<"2"<<endl;
         Hamiltonian_BHZ_.Diagonalizer();
-
+        cout<<"3"<<endl;
+        
         Observables_BHZ Observables_BHZ_(Parameters_BHZ_,Connection_BHZ_,Hamiltonian_BHZ_);
+        Observables_BHZ_.Initialize();
         Observables_BHZ_.Calculate_Local_Density_of_Electrons();
         //Observables_BHZ_.Calculate_MomSpace_Occupation_Number();
         //Observables_BHZ_.Calculate_Spectral_Function();

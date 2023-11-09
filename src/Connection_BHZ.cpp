@@ -23,7 +23,7 @@ void Connection_BHZ::Initialize(){
     spin_=2;
 
     size_=Parameters_BHZ_.Ham_Size;
-    C_mat = MatrixXcd::Zero(size_,size_);
+    C_mat=MatrixXcd::Zero(size_,size_);
 
     if(Parameters_BHZ_.PBC_X==true){
         Periodic_X=true;
@@ -38,15 +38,14 @@ void Connection_BHZ::Initialize(){
     else{
         Periodic_Y=false;
     }
-
-    complex<double> One_Complex(1.0,0.0),Zero_Complex(0.0,0.0),Iota_Complex(0.0,1.0);
 }
 
 void Connection_BHZ::ConnectionMatrix(){
 
     int r, r0, r1, r2;
     int half_size_= (int) (size_/2);
-        
+    
+    complex<double> One_Complex(1.0,0.0),Zero_Complex(0.0,0.0),Iota_Complex(0.0,1.0);
 
     for(int spin=0;spin<spin_;spin++){
         for(int orb=0;orb<orbs_;orb++){
@@ -59,7 +58,7 @@ void Connection_BHZ::ConnectionMatrix(){
 
                     //Adding onsite mass term and NN hopping connections:---->
                     C_mat(r,r) = 1.0*( pow(-1.0, 1.0*orb) )*(M_-4*B_)*One_Complex;
-
+                    
                     if(rx!=lx_-1){
                         C_mat(r,r1) = 1.0*( pow(-1.0, 1.0*orb) )*B_*One_Complex;
                         C_mat(r1,r) = 1.0*( pow(-1.0, 1.0*orb) )*B_*One_Complex;
@@ -85,14 +84,14 @@ void Connection_BHZ::ConnectionMatrix(){
                     }
 
                     //Adding smooth boundary connections
-                    if(rx <= w_){
-                        C_mat(r,r) += 1.0*( Vo_*(w_-rx)/(1.0*w_) )*One_Complex;
+                    if(Parameters_BHZ_.SBC_X==true){
+                        if(rx <= w_){
+                            C_mat(r,r) += 1.0*( Vo_*(w_-rx)/(1.0*w_) )*One_Complex;
+                        }
+                        if(rx >= lx_-w_){
+                            C_mat(r,r) += 1.0*( Vo_*(rx+w_-lx_+1)/(1.0*w_) )*One_Complex;
+                        }
                     }
-                    if(rx >= lx_-w_){
-                        C_mat(r,r) += 1.0*( Vo_*(rx+w_-lx_+1)/(1.0*w_) )*One_Complex;
-                    }
-
-
                 }
             }
         }
@@ -186,7 +185,7 @@ void Connection_BHZ::ConnectionMatrix(){
             }
         }
     }
-
+    
 }
 
 void Connection_BHZ::PrintConnection(){

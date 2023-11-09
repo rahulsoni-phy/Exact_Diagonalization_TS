@@ -11,7 +11,7 @@ class Parameters_BHZ{
                 int Total_Particles;
                 double A_val, B_val, M_val, Vo_val;
                 double Fill;
-                bool PBC_X,PBC_Y;
+                bool PBC_X,PBC_Y,SBC_X;
 
                 double Temp,beta;
 

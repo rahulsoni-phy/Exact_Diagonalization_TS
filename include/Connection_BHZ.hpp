@@ -13,12 +13,10 @@ class Connection_BHZ
 public:
     Connection_BHZ(Parameters_BHZ& Parameters_BHZ__):Parameters_BHZ_(Parameters_BHZ__){
         Initialize();
-        ConnectionMatrix();
     }
     int lx_, ly_, w_;
     int orbs_, spin_,size_;
-    double A_, B_, M_,Vo_;
-    complex<double> Zero_Complex, One_Complex, Iota_Complex;
+    double A_, B_, M_, Vo_;
 
     MatrixXcd C_mat;
 
