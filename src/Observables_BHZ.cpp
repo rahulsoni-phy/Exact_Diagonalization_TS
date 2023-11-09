@@ -33,50 +33,6 @@ void Observables_BHZ::Initialize(){
 
     w_size = (int) ( (Parameters_BHZ_.w_max - Parameters_BHZ_.w_min)/dw );
 
-    B_mat.resize(cells_);
-    for(int r1=0;r1<cells_;r1++){
-        B_mat[r1].resize(cells_);
-
-        for(int r2=0;r2<cells_;r2++){
-            B_mat[r1][r2].resize(w_size);
-
-            for(int om=0;om<w_size;om++){
-                B_mat[r1][r2][om] = Zero_Complex;
-            }
-        }
-    }
-
-    int m1,m2;
-    omega=0.0;
-
-    for(int r1=0;r1<cells_;r1++){
-        r1x = r1/ly_;
-        r1y = r1%ly_;
-
-        for(int r2=0;r2<cells_;r2++){
-            r2x = r2/ly_;
-            r2y = r2%ly_;
-
-            for(int om=0;om<w_size;om++){
-                omega = Parameters_BHZ_.w_min + om*dw;
-
-                for(int orb=0;orb<orbs_;orb++){
-                    for(int s=0;s<spin_;s++){
-                        m1 = s*mhs_ + orb + 2*r1y + 2*ly_*r1x;
-                        m2 = s*mhs_ + orb + 2*r2y + 2*ly_*r2x;
-
-                        for(int n=0;n<size_;n++){
-                            B_mat[r1][r2][om] += (1.0/PI)*( ( conj(evecs_(n,m1)) ) * (evecs_(n,m2)) )*( 
-                                (eta)/((omega-evals_(n))*(omega-evals_(n))+(eta*eta)) );
-                        }
-                    }
-                }
-            }
-
-        }
-
-    }
-
 }
 
 
@@ -162,6 +118,53 @@ void Observables_BHZ::Calculate_Density_of_States(){
         file_dos_out<<dos_val<<endl;
         omega = omega + dw;
     }    
+}
+
+
+void Observables_BHZ::Calculate_Bmat(){
+    B_mat.resize(cells_);
+    for(int r1=0;r1<cells_;r1++){
+        B_mat[r1].resize(cells_);
+
+        for(int r2=0;r2<cells_;r2++){
+            B_mat[r1][r2].resize(w_size);
+
+            for(int om=0;om<w_size;om++){
+                B_mat[r1][r2][om] = Zero_Complex;
+            }
+        }
+    }
+
+    int m1,m2;
+    omega=0.0;
+
+    for(int r1=0;r1<cells_;r1++){
+        r1x = r1/ly_;
+        r1y = r1%ly_;
+
+        for(int r2=0;r2<cells_;r2++){
+            r2x = r2/ly_;
+            r2y = r2%ly_;
+
+            for(int om=0;om<w_size;om++){
+                omega = Parameters_BHZ_.w_min + om*dw;
+
+                for(int orb=0;orb<orbs_;orb++){
+                    for(int s=0;s<spin_;s++){
+                        m1 = s*mhs_ + orb + 2*r1y + 2*ly_*r1x;
+                        m2 = s*mhs_ + orb + 2*r2y + 2*ly_*r2x;
+
+                        for(int n=0;n<size_;n++){
+                            B_mat[r1][r2][om] += (1.0/PI)*( ( conj(evecs_(n,m1)) ) * (evecs_(n,m2)) )*( 
+                                (eta)/((omega-evals_(n))*(omega-evals_(n))+(eta*eta)) );
+                        }
+                    }
+                }
+            }
+
+        }
+
+    }
 }
 
 
@@ -360,6 +363,146 @@ void Observables_BHZ::Calculate_Spectral_Function(){
         }
         file_Akxw_out<<endl;
     }
+}
+
+
+void Observables_BHZ::Calculate_Spin_Currents(){
+
+    Mat_4_Complex_doub SpinCurrent_UP, SpinCurrent_DN;
+    
+    SpinCurrent_UP.resize(lx_*ly_);   SpinCurrent_DN.resize(lx_*ly_);
+    for(int cell1=0;cell1<lx_*ly_;cell1++){
+        SpinCurrent_UP[cell1].resize(lx_*ly_);     SpinCurrent_DN[cell1].resize(lx_*ly_);
+
+        for(int cell2=0;cell2<lx_*ly_;cell2++){
+            SpinCurrent_UP[cell1][cell2].resize(orbs_);     SpinCurrent_DN[cell1][cell2].resize(orbs_);
+
+            for(int orb1=0;orb1<orbs_;orb1++){
+                SpinCurrent_UP[cell1][cell2][orb1].resize(orbs_);     SpinCurrent_DN[cell1][cell2][orb1].resize(orbs_);
+
+                for(int orb2=0;orb2<orbs_;orb2++){
+                    SpinCurrent_UP[cell1][cell2][orb1][orb2]=Zero_Complex;
+                    SpinCurrent_DN[cell1][cell2][orb1][orb2]=Zero_Complex;
+                }
+            }
+        }
+    }
+
+    int m1, m2;
+    int cell_ind1, cell_ind2;
+
+    for(int s=0;s<2;s++){
+
+        for(int r1x=0;r1x<lx_;r1x++){
+            for(int r1y=0;r1y<ly_;r1y++){
+                cell_ind1 = r1y + ly_*r1x;
+
+                for(int orb1=0;orb1<orbs_;orb1++){
+                    m1 = s*mhs_ + orb1 + 2*r1y + 2*ly_*r1x;
+
+                    for(int r2x=0;r2x<lx_;r2x++){
+                        for(int r2y=0;r2y<ly_;r2y++){
+                            cell_ind2 = r2y + ly_*r2x;
+
+                            for(int orb2=0;orb2<orbs_;orb2++){
+                                m2 = s*mhs_ + orb2 + 2*r2y + 2*ly_*r2x;
+
+                                if(s==0){
+                                    if(Connection_BHZ_.C_mat(m1,m2).real()!=0 || Connection_BHZ_.C_mat(m1,m2).imag()!=0){
+                                        for(int n=0;n<size_;n++){
+                                            SpinCurrent_UP[cell_ind1][cell_ind2][orb1][orb2] += One_Complex*Connection_BHZ_.C_mat(m1,m2)*
+                                                        ( (conj(evecs_(n,m1)) )*((evecs_(n,m2))) )*( Hamiltonian_BHZ_.FermiFunction(evals_(n),mu_val) );
+                                        }
+                                    }
+                                }
+
+                                if(s==1){
+                                    if(Connection_BHZ_.C_mat(m1,m2).real()!=0 || Connection_BHZ_.C_mat(m1,m2).imag()!=0){
+                                        for(int n=0;n<size_;n++){
+                                            SpinCurrent_DN[cell_ind1][cell_ind2][orb1][orb2] += One_Complex*Connection_BHZ_.C_mat(m1,m2)*
+                                                        ( (conj(evecs_(n,m1)) )*((evecs_(n,m2))) )*( Hamiltonian_BHZ_.FermiFunction(evals_(n),mu_val) );
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+
+                }
+            }
+        }
+
+    }
+
+    Mat_2_Complex_doub SC_UP_TOT, SC_DN_TOT;
+    SC_UP_TOT.resize(lx_*ly_);      SC_DN_TOT.resize(lx_*ly_);
+    for(int cell1=0;cell1<lx_*ly_;cell1++){
+        SC_UP_TOT[cell1].resize(lx_*ly_);
+        SC_DN_TOT[cell1].resize(lx_*ly_);
+
+        for(int cell2=0;cell2<lx_*ly_;cell2++){
+            SC_UP_TOT[cell1][cell2]=Zero_Complex;
+            SC_DN_TOT[cell1][cell2]=Zero_Complex;
+        }
+    }
+
+    int m1_up,m1_dn,m2_up,m2_dn;
+
+    string file_spin_up_current="Total_spin_up_current_at_each_cell_link.txt";
+    ofstream file_spin_up_current_out(file_spin_up_current.c_str());
+
+    string file_spin_dn_current="Total_spin_dn_current_at_each_cell_link.txt";
+    ofstream file_spin_dn_current_out(file_spin_dn_current.c_str());
+
+    for(int r1x=0;r1x<lx_;r1x++){
+        for(int r1y=0;r1y<ly_;r1y++){
+            cell_ind1 = r1y + ly_*r1x;
+
+            for(int r2x=0;r2x<lx_;r2x++){
+                for(int r2y=0;r2y<ly_;r2y++){
+                    cell_ind2 = r2y + ly_*r2x;
+
+                    for(int orb1=0;orb1<orbs_;orb1++){
+                        for(int orb2=0;orb2<orbs_;orb2++){
+                            
+                            SC_UP_TOT[cell_ind1][cell_ind2] += SpinCurrent_UP[cell_ind1][cell_ind2][orb1][orb2];
+                            SC_DN_TOT[cell_ind1][cell_ind2] += SpinCurrent_DN[cell_ind1][cell_ind2][orb1][orb2];
+
+                        }
+                    }
+
+                    file_spin_up_current_out<<cell_ind1<<"  "<<cell_ind2<<"     "<<(-1.0)*SC_UP_TOT[cell_ind1][cell_ind2].imag()<<endl;
+                    file_spin_dn_current_out<<cell_ind1<<"  "<<cell_ind2<<"     "<<(1.0)*SC_DN_TOT[cell_ind1][cell_ind2].imag()<<endl;
+
+                }
+            }
+        }
+    }
+
+    string file_avg_spin_current="Avg_spin_current_along_ry_vs_rx.txt";
+    ofstream file_avg_spin_current_out(file_avg_spin_current.c_str());
+
+    complex<double> avg_SC_val_up,avg_SC_val_dn;
+    for(int r1x=0;r1x<lx_;r1x++){
+        avg_SC_val_up=Zero_Complex;
+        avg_SC_val_dn=Zero_Complex;
+
+        for(int r1y=0;r1y<ly_;r1y++){
+            cell_ind1 = r1y + ly_*r1x;
+
+            for(int r2y=0;r2y<ly_;r2y++){
+                cell_ind2 = r2y + ly_*r1x;
+
+                avg_SC_val_up += SC_UP_TOT[cell_ind1][cell_ind2];
+                avg_SC_val_dn += SC_DN_TOT[cell_ind1][cell_ind2];
+            }
+        }
+        file_avg_spin_current_out<<r1x<<"   "<<(-1.0)*avg_SC_val_up.imag()<<"     "<<avg_SC_val_dn.imag()<<endl;
+    }
+
+
+
 }
 
 

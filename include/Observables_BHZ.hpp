@@ -45,8 +45,10 @@ public:
     void Calculate_Local_Density_of_Electrons();
     void Calculate_Density_of_States();
     void Calculate_MomSpace_Occupation_Number();
+    void Calculate_Bmat();
     void Calculate_Energy_Bands_on_Path();
     void Calculate_Spectral_Function();
+    void Calculate_Spin_Currents();
     void Calculate_Spin_Chern_Number();
 
     Parameters_BHZ &Parameters_BHZ_;
